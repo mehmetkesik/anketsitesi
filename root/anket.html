@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+    <title>Anket {{.Anket.Id}}</title>
+    <meta id='description' name='description' content='anket'/>
+    <meta id='keywords' name='keywords' content='anket sitesi'/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width-device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="shortcut icon" href="/root/img/ico.ico"/>
+    <link rel="stylesheet" href="/root/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/root/css/style.css"/>
+    <script src="/root/js/popper.min.js"></script>
+    <script src="/root/js/bootstrap.min.js"></script>
+    <script src="/root/js/jquery-2.2.0.min.js"></script>
+    <script src="/root/js/anket.js"></script>
+    <script src="/root/js/anketx.js"></script>
+    <script type="text/javascript">
+        //var yorumsayisi = {{.Anket.YorumSayisi}};
+
+        function yorumla(id) {
+            let nick = document.getElementById("nick").value;
+            let yorum = document.getElementById("yorum").value;
+            if (nick != "" && yorum != "") {
+                $.post("/post", {
+                    yorumyolla: "tiktak",
+                    anketid: id,
+                    nick: nick,
+                    yorum: yorum
+                }, function (data, status) {
+                    if (status == "success") {
+                        if (data.durum == "ok") {
+                            document.getElementById("nick").value = "";
+                            document.getElementById("yorum").value = "";
+                            //document.getElementById("yorumgonderildi").style.display = "inline-block";
+                            //yorumsayisi += 1;
+                            //document.getElementById("yorumsayisi").innerHTML = "Bu anket için " + yorumsayisi + " yorum\n" +
+                            // " bulunuyor.";
+                            setTimeout("yorumgonderkapat()", 3000);
+                            location.reload();
+                        } else {
+                            alert("hata: " + JSON.stringify(data));
+                        }
+                    } else {
+                        alert("hata");
+                    }
+                }, "json");
+            }
+            return false;
+        }
+
+        function yorumgonderkapat() {
+            document.getElementById("yorumgonderildi").style.display = "none";
+        }
+    </script>
+</head>
+<body id="body">
+<div class="container p0">
+    <br/>
+{{template "navbar.html" .}}
+    <br/>
+    <div class="row m0">
+        <div class="col-lg-3" id="menudiv">
+        {{template "menu.html" .}}
+        </div>
+        <div class="col-lg-9">
+            <div class="row m0">
+                <div id="anket" class="card text-white bg-dark mb-3"
+                     style="margin: 0 auto;width: 100%;">
+                    <div class="card-header">{{.Anket.Ad}}
+                        <span class="text-right" style="float: right;">
+                        {{.Anket.Zaman}}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title">{{.Anket.Baslik}}</h4>
+                        <br/>
+                        <div class="row m0">
+                            <div class="col-md-4">
+                                <canvas id="tuval{{.Anket.Id}}" width="200" height="200" style="border-radius: 15px;">
+                                    Bu browser canvas desteklemiyor..!
+                                </canvas>
+                                <script type="text/javascript">
+                                    {{$tip := .Anket.Tip}}
+                                    {{if eq $tip 0}}
+                                    Run({{.Anket.Id}}, `{{.Anket.SecenekJson}}`, "rgb(37, 40, 48)",{{if .Anket.Aktif}}true{{end}});
+                                    {{else}}
+                                    Runx({{.Anket.Id}}, `{{.Anket.SecenekJson}}`, "rgb(37, 40, 48)", {{if .Anket.Aktif}}true{{end}});
+                                    {{end}}
+                                </script>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row m0"><!-- yorum yap -->
+                                    <form style="width: 90%;margin: 0 auto;" action="" method="post"
+                                          onsubmit="return yorumla({{.Anket.Id}})">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="nick" placeholder="Nick"
+                                                   maxlength="20" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea class="form-control" id="yorum" placeholder="Yorum.."
+                                                      maxlength="200" required></textarea>
+                                        </div>
+                                        <div class="form-row" style="padding-left: 5px;">
+                                            <div class="form-group">
+                                                <input type="submit" class="form-control" name="yorumyolla"
+                                                       value="Gönder" style="cursor: pointer;">
+                                            </div>
+                                            <div class="form-group" id="yorumgonderildi" style="display: none;">
+                                                <p style="padding-left: 10px;">Yorum Gönderildi</p>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div><!-- yorum yap son -->
+                            </div>
+                        </div>
+                        <p id="deneme"></p>
+                        <p class="card-text" id="yorumsayisi">Bu anket için {{.Anket.YorumSayisi}} yorum
+                            bulunuyor.</p>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    document.getElementById("anket").style.height = document.getElementById("menudiv").offsetHeight + "px";
+                </script>
+            </div>
+            <div class="row m0">
+                <div class="col-md-12">
+                    <ul class="list-group" id="yorumlarliste">
+                    {{range $index,$value := .Anket.Yorumlar}}
+                        <li class="list-group-item">
+                            <h5 class="text-info">{{$value.Nick}}</h5>
+                            <p style="margin-left: 10px;">{{$value.Yorum}}</p>
+                            <span style="float: right;" class="text-muted">{{$value.Zaman}}</span>
+                            <br/>
+                        </li>
+                    {{end}}
+                    </ul>
+                </div>
+            </div>
+        {{if ne .Anket.YorumSayisi 0}}
+            <br/>
+            <div class="row m0"><!-- sayfalama -->
+                <div class="col-md-1 text-left">
+                    <a class="page-link" href="{{if .GeriDurum}}/?anketler={{.Link}}&sayfa={{.Geri}}{{else}}#{{end}}"
+                       aria-label="Previous" style="background-color: #1d2124;border-radius: 5px;">
+                        <span aria-hidden="true" style="font-size: 24px;">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </div>
+                <div class="col-md-10"></div>
+                <div class="col-md-1 text-right">
+                    <a class="page-link" href="{{if .IleriDurum}}/?anketler={{.Link}}&sayfa={{.Ileri}}{{else}}#{{end}}"
+                       aria-label="Next" style="background-color: #1d2124;border-radius: 5px;">
+                        <span aria-hidden="true" style="font-size: 24px;">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div><!-- sayfalama son -->
+            <br/>
+        {{end}}
+        </div>
+    </div>
+    <br/>
+    <div class="row m0">
+    {{template "footer.html" .}}
+    </div>
+    <br/>
+</div>
+</body>
+</html>

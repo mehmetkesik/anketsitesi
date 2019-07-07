@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <title>Anket</title>
+    <meta id='description' name='description' content='anket'/>
+    <meta id='keywords' name='keywords' content='anket sitesi'/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width-device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="shortcut icon" href="/root/img/ico.ico"/>
+    <link rel="stylesheet" href="/root/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/root/css/style.css"/>
+    <script src="/root/js/popper.min.js"></script>
+    <script src="/root/js/jquery-2.2.0.min.js"></script>
+    <script src="/root/js/bootstrap.min.js"></script>
+    <script src="/root/js/anket.js"></script>
+    <script src="/root/js/anketx.js"></script>
+    <script type="text/javascript">
+        function mesajyolla() {
+            let baslik = document.getElementById("baslik").value;
+            let mesaj = document.getElementById("mesaj").value;
+            if (baslik != "" && mesaj != "") {
+                $.post("/post", {
+                    mesajyolla: "tiktak",
+                    baslik: baslik,
+                    mesaj: mesaj
+                }, function (data, status) {
+                    if (status == "success") {
+                        if (data.durum == "ok") {
+                            document.getElementById("baslik").value = "";
+                            document.getElementById("mesaj").value = "";
+                            document.getElementById("mesajgonderildi").style.display = "inline-block";
+                            setTimeout("mesajgonderkapat()", 3000);
+                        } else {
+                            alert("hata: " + JSON.stringify(data));
+                        }
+                    } else {
+                        alert("hata");
+                    }
+                }, "json");
+            }
+            return false;
+        }
+        function mesajgonderkapat() {
+            document.getElementById("mesajgonderildi").style.display = "none";
+        }
+    </script>
+</head>
+<body>
+<div class="container p0">
+    <br/>
+{{template "navbar.html" .}}
+    <br/>
+    <div class="row m0">
+        <div class="col-lg-3">
+        {{template "menu.html" .}}
+        </div>
+        <div class="col-lg-9">
+            <div class="row m0"><!-- mesaj gönder -->
+                <h3 style="padding-bottom: 20px;">Bizimle İletişime Geçin</h3>
+                <form style="width: 90%;margin: 0 auto;" action="" method="post"
+                      onsubmit="return mesajyolla()">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="baslik" placeholder="Başlık.."
+                               maxlength="20" required>
+                    </div>
+                    <div class="form-group">
+                                            <textarea class="form-control" id="mesaj" placeholder="Mesaj.."
+                                                      maxlength="200" required></textarea>
+                    </div>
+                    <div class="form-row" style="padding-left: 5px;">
+                        <div class="form-group">
+                            <input type="submit" class="form-control" name="myolla"
+                                   value="Gönder" style="cursor: pointer;">
+                        </div>
+                        <div class="form-group" id="mesajgonderildi" style="display: none;">
+                            <p style="padding-left: 10px;">Mesaj Gönderildi</p>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- mesaj gönder son -->
+        </div>
+    </div>
+    <div class="row m0">
+    {{template "footer.html" .}}
+    </div>
+    <br/>
+</div>
+</body>
+</html>

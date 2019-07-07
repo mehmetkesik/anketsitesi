@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yönetici Sayfası</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width-device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="shortcut icon" href="/root/img/ico.ico"/>
+    <link rel="stylesheet" href="/root/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/root/css/style.css"/>
+    <script src="/root/js/popper.min.js"></script>
+    <script src="/root/js/jquery-2.2.0.min.js"></script>
+    <script src="/root/js/bootstrap.min.js"></script>
+    <script src="/root/js/anket.js"></script>
+    <script src="/root/js/anketx.js"></script>
+    <script type="text/javascript">
+        let yeniseceneksayi = 0;
+
+        function secenekekle() {
+            yeniseceneksayi += 1;
+            let yenisecenek = `
+                <div class="form-row" id="secenek` + yeniseceneksayi + `">
+                    <div class="col-md-9 text-left">
+                        <input type="text" class="form-control" name="secenek` + yeniseceneksayi + `"
+                            maxlength="50" value="" required>
+                    </div>
+                    <div class="col-md-3 text-right">
+                        <button class="btn" style="cursor:pointer" onclick="seceneksil(` + yeniseceneksayi + `)">Sil
+                        </button>
+                        <br/>
+                        <br/>
+                    </div>
+                </div>`;
+            document.getElementById("secenekler").innerHTML += yenisecenek;
+            return false;
+        }
+
+        function seceneksil(secenekid) {
+            document.getElementById("secenek" + secenekid).remove();
+            return false;
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <br/>
+    <div class="row m0"><!-- navbar -->
+        <div class="col-lg-12">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="border-radius: 10px;">
+                <a class="navbar-brand" href="/">Anketör</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/yonet">Profil <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/yonet?ekle=anket">Anket Ekle <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/yonet?cikis=tiktak">Çıkış <span class="sr-only">(current)</span></a>
+                        </li>
+                    </ul>
+                    <form class="form-inline my-2 my-lg-0" method="get">
+                        <input class="form-control mr-sm-2" type="text" name="ara" placeholder="Anket.."
+                               aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="cursor:pointer;">Ara
+                        </button>
+                    </form>
+                </div>
+            </nav>
+        </div>
+    </div><!-- navbar son -->
+    <br/>
+    <!-- Anketler -->
+{{range $index,$value := .Anketler}}
+{{if HesapUst $index}}
+<div class="row m0">
+{{end}}
+    <div class="col-md-6">
+        <a href="/yonet?anket={{$value.Id}}" style="text-decoration: none;">
+            <div id="anket" class="card text-white bg-dark mb-3"><!-- card -->
+                <div class="card-header">{{$value.Ad}}
+                    <span class="text-right" style="float: right;">
+                    {{$value.Zaman}}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">{{$value.Baslik}}</h4>
+                    <canvas id="tuval{{$value.Id}}" width="200" height="200"
+                            style="border-radius: 15px;">
+                        Bu browser canvas desteklemiyor..!
+                    </canvas>
+                    <script type="text/javascript">
+                        {{$tip := $value.Tip}}
+                        {{if eq $tip 0}}
+                        Run({{$value.Id}}, `{{$value.SecenekJson}}`, "rgb(37, 40, 48)");
+                        {{else}}
+                        Runx({{$value.Id}}, `{{$value.SecenekJson}}`, "rgb(37, 40, 48)");
+                        {{end}}
+                    </script>
+                    <br/>
+                    <p class="card-text">Bu anket için {{$value.YorumSayisi}} yorum
+                        bulunuyor.</p>
+                </div>
+            </div><!-- card son -->
+        </a>
+    </div>
+{{if HesapAlt $index}}
+</div>
+{{end}}
+{{end}}
+    <!-- Anketler son -->
+
+    <!-- Anket düzenle -->
+{{if .AnketDurum}}
+    <div class="row m0">
+        <div class="col-md-4">
+            <canvas id="tuval{{.Anket.Id}}" width="200" height="200" style="border-radius: 15px;">
+                Bu browser canvas desteklemiyor..!
+            </canvas>
+            <script type="text/javascript">
+                {{$tip := .Anket.Tip}}
+                {{if eq $tip 0}}
+                Run({{.Anket.Id}}, `{{.Anket.SecenekJson}}`, "rgb(37, 40, 48)");
+                {{else}}
+                Runx({{.Anket.Id}}, `{{.Anket.SecenekJson}}`, "rgb(37, 40, 48)");
+                {{end}}
+            </script>
+        </div>
+        <div class="col-md-8">
+            <h4>Anket Bilgileri</h4>
+            <br/>
+            <div class="row m0"><!-- anket bilgi -->
+                <form style="width: 90%;margin: 0 auto;" action="" method="post">
+                    <input type="text" class="form-control" id="silinecekid" name="silinecekid" value=""
+                           style="display: none;">
+                    <input type="text" class="form-control" name="anketid" value="{{.Anket.Id}}" style="display: none;"
+                           required>
+                    <div class="form-group">
+                        Anket Adı:
+                        <input type="text" class="form-control" name="ad" placeholder="Ad.."
+                               maxlength="50" value="{{.Anket.Ad}}" required>
+                    </div>
+                    <div class="form-group">
+                        Anket Başlığı:
+                        <input type="text" class="form-control" name="baslik" placeholder="Baslik.."
+                               maxlength="150" value="{{.Anket.Baslik}}" required>
+                    </div>
+                    <hr/>
+                    <div class="form-row">
+                        <div class="col-md-6 text-left">
+                            Seçenekler:
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button class="btn" style="cursor:pointer" onclick="return secenekekle()">Seçenek Ekle
+                            </button>
+                        </div>
+                    </div>
+                    <br/>
+                    <div id="secenekler">
+                    {{range $index,$value := .Anket.Secenekler}}
+                        <div class="form-row" id="secenek{{$value.Id}}">
+                            <div class="col-md-9 text-left">
+                                <input type="text" class="form-control" name="secenek{{$value.Id}}"
+                                       maxlength="50" value="{{$value.Ad}}" required>
+                            </div>
+                            <div class="col-md-3 text-right">
+                                <button class="btn" style="cursor:pointer"
+                                        onclick="return seceneksil({{$value.Id}},false)">Sil
+                                </button>
+                                <br/>
+                                <br/>
+                            </div>
+                        </div>
+                    {{end}}
+                    </div>
+                    <div class="form-row" style="padding-left: 5px;">
+                        <div class="form-group">
+                            <input type="submit" class="form-control" name="anketguncelle"
+                                   value="Kaydet" style="cursor: pointer;">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><!-- anket bilgi son -->
+    </div>
+</div>
+{{end}}
+<!-- Anket düzenle son -->
+<!-- Anket ekle -->
+{{if .AnketEkle}}
+<div class="row m0">
+    <div class="col-md-12">
+        <h4>Anket Bilgileri</h4>
+        <br/>
+        <div class="row m0"><!-- anket bilgi -->
+            <form style="width: 90%;margin: 0 auto;" action="" method="post">
+                <div class="form-group">
+                    Anket Adı:
+                    <input type="text" class="form-control" name="ad" placeholder="Ad.."
+                           maxlength="50" value="" required>
+                </div>
+                <div class="form-group">
+                    Anket Başlığı:
+                    <input type="text" class="form-control" name="baslik" placeholder="Baslik.."
+                           maxlength="150" value="" required>
+                </div>
+                <hr/>
+                <div class="form-row">
+                    <div class="col-md-6 text-left">
+                        Seçenekler:
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <button class="btn" style="cursor:pointer" onclick="return secenekekle()">Seçenek Ekle
+                        </button>
+                    </div>
+                </div>
+                <br/>
+                <div id="secenekler">
+                </div>
+                <div class="form-row" style="padding-left: 5px;">
+                    <div class="form-group">
+                        <input type="submit" class="form-control" name="anketyolla"
+                               value="Kaydet" style="cursor: pointer;">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div><!-- anket bilgi son -->
+</div>
+</div>
+{{end}}
+<!-- Anket ekle son -->
+{{if .AnasayfaDurum}}
+<div class="row m0"><!-- anket bilgi -->
+    <form style="width: 50%;margin: 0 auto;" action="" method="post">
+        <div class="form-group">
+            Kullanıcı Adı:
+            <input type="text" class="form-control" name="nick" placeholder="Kullanıcı Adı.."
+                   maxlength="50" value="{{.Nick}}" required>
+        </div>
+        <div class="form-group">
+            Şifre:
+            <input type="text" class="form-control" name="sifre" placeholder="Şifre.."
+                   maxlength="50" value="{{.Sifre}}" required>
+        </div>
+        <div class="form-row" style="padding-left: 5px;">
+            <div class="form-group">
+                <input type="submit" class="form-control" name="profilguncelle" value="Kaydet" style="cursor: pointer;"/>
+            </div>
+        </div>
+    </form>
+</div>
+{{end}}
+<br/><br/>
+</div>
+</body>
+</html>

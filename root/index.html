@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+    <title>Anket</title>
+    <meta id='description' name='description' content='anket'/>
+    <meta id='keywords' name='keywords' content='anket sitesi'/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width-device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="shortcut icon" href="/root/img/ico.ico"/>
+    <link rel="stylesheet" href="/root/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/root/css/style.css"/>
+    <script src="/root/js/popper.min.js"></script>
+    <script src="/root/js/jquery-2.2.0.min.js"></script>
+    <script src="/root/js/bootstrap.min.js"></script>
+    <script src="/root/js/anket.js"></script>
+    <script src="/root/js/anketx.js"></script>
+</head>
+<body>
+<div class="container p0">
+    <br/>
+{{template "navbar.html" .}}
+    <br/>
+    <div class="row m0">
+        <div class="col-lg-3">
+        {{template "menu.html" .}}
+        </div>
+        <div class="col-lg-9">
+        {{template "slider.html" .}}
+        </div>
+    </div>
+    <div class="row m0">
+    {{template "footer.html" .}}
+    </div>
+    <br/>
+</div>
+<script type="text/javascript">
+    //Post Get işlemleri
+    /*var xhttp = new XMLHttpRequest();
+    xhttp.open("post", "/post", false);//false senkron olacağını söyler.
+    xhttp.send("merhabaa");//veriyi burada belirtiriz.
+    alert(xhttp.responseText); //sonucu burada alırız.
+    */
+    //Burada düzgün bir şekilde canvas çizdirildi :)))
+    /*var xhttp = new XMLHttpRequest();
+    xhttp.open("post", "/post", false);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");//form şeklinde veri göndermek için
+    xhttp.send("deneme=tiktak&merhaba=canim");
+    //alert(xhttp.responseText);
+    var s = xhttp.responseText;
+    Run(1, s, "rgb(37, 40, 48)", false);
+    alert("burada");*/
+</script>
+</body>
+</html>
