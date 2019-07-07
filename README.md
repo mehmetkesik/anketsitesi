@@ -1,5 +1,5 @@
 # anket sitesi
-Go programlama dili ile anket sitesi
+Go programlama dili ile anket sitesi.
 
 ## Bağımlılıklar
 - Projenin https://github.com/mattn/go-sqlite3 kütüphanesine bağımlılığı vardır.
